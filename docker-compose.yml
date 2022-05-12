@@ -1,0 +1,70 @@
+version: '3.8'
+services:
+  api:
+    build: .
+    volumes:
+      - .:/usr/file-microsservice
+      - node_modules:/usr/file-microsservice/node_modules
+    command: yarn start:dev
+    restart: always
+    depends_on:
+      - postgres
+      - pgadmin
+    environment:
+      - JWT_SECRET=${JWT_SECRET}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_TYPE=${DB_TYPE}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_NAME=${DB_NAME}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+      - DEFAULT_REGION=${DEFAULT_REGION}
+      - DEFAULT_FILES_ACL=${DEFAULT_FILES_ACL}
+      - AWS_ACCESS_KEY=${AWS_ACCESS_KEY}
+      - AWS_SECRET_ACCESS=${AWS_SECRET_ACCESS}
+      - NODE_TLS_REJECT_UNAUTHORIZED=${NODE_TLS_REJECT_UNAUTHORIZED}
+      - LOCAL_UPLOAD=${LOCAL_UPLOAD}
+      - PORT=3001
+    ports:
+      - '3001:3001'
+    networks:
+      - postgres
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - /data/postgres:/data/postgres
+    networks:
+      - postgres
+
+  pgadmin:
+    links:
+      - postgres:postgres
+    container_name: pgadmin
+    depends_on:
+      - postgres
+    image: dpage/pgadmin4
+    ports:
+      - '8081:80'
+    volumes:
+      - /data/pgadmin:/root/.pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    networks:
+      - postgres
+
+volumes:
+  node_modules: {}
+
+networks:
+  postgres:
+    driver: bridge
