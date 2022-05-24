@@ -9,7 +9,7 @@ import { File } from './entities/file.entity';
 export class FileService {
   constructor(
     @InjectRepository(File) private repository: Repository<File>,
-    @Inject('UPLOAD_REPOSITORY') private uploadRepository: UploadRepository,
+    @Inject('UPLOAD_REPOSITORY') private uploadRepository: UploadRepository, //@InjectQueue('upload') private fileQueue: Queue,
   ) {}
 
   public async find(ownerId: string): Promise<File[]> {
@@ -28,7 +28,7 @@ export class FileService {
     files: FileDto[],
     ownerId?: string,
     ownerType?: string,
-  ): Promise<File[]> {
+  ): Promise<any[]> {
     if (process.env.LOCAL_UPLOAD === 'true') {
       return this.save(files, ownerId, ownerType);
     } else {

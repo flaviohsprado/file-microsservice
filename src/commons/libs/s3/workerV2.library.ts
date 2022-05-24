@@ -1,10 +1,9 @@
-import { IFile } from './../../../interfaces/file.interface';
-import { config } from './../../constants/aws.constant';
-import { IWorkingLibrary } from './../../../interfaces/working.interface';
 import { Injectable, Logger } from '@nestjs/common';
-import { createReadStream, ReadStream } from 'fs';
-import { s3ClientV2 } from './clientV2.service';
 import StandardError from '../../../utils/error.utils';
+import { IFile } from './../../../interfaces/file.interface';
+import { IWorkingLibrary } from './../../../interfaces/working.interface';
+import { config } from './../../constants/aws.constant';
+import { s3ClientV2 } from './clientV2.service';
 
 @Injectable()
 export class s3WorkerV2Library implements IWorkingLibrary {
@@ -15,12 +14,7 @@ export class s3WorkerV2Library implements IWorkingLibrary {
     this.logger = new Logger('s3WorkerLibrary');
   }
 
-  public async download(key: string): Promise<any> {
-    const bucketParams = {
-      Bucket: this.bucketName,
-      Key: key,
-    };
-
+  public async download(): Promise<any> {
     s3ClientV2.listObjects({ Bucket: this.bucketName }, function (err, data) {
       if (err) {
         console.log('Error', err);

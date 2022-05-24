@@ -5,13 +5,13 @@ import { uuid } from 'uuidv4';
 
 export class FileDto {
   @IsOptionalString()
-  id: string;
+  id?: string;
 
   @IsOptionalString()
-  ownerId: string;
+  ownerId?: string;
 
   @IsOptionalString()
-  ownerType: string;
+  ownerType?: string;
 
   @IsRequiredString()
   fieldname: string;
@@ -26,10 +26,10 @@ export class FileDto {
   mimetype: string;
 
   @IsRequiredString()
-  key: string;
+  key?: string;
 
   @IsRequiredString()
-  url: string;
+  url?: string;
 
   @ApiProperty({ type: Buffer })
   buffer: Buffer;

@@ -10,9 +10,10 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { Readable } from 'stream';
+import { DeleteApiResponse } from './../commons/decorators/requests/deleteApiResponse.decorator';
 import { GetApiResponse } from './../commons/decorators/requests/getApiResponse.decorator';
 import { PostApiResponse } from './../commons/decorators/requests/postApiResponse.decorator';
-import { DeleteApiResponse } from './../commons/decorators/requests/deleteApiResponse.decorator';
+import { UploadProducer } from './../jobs/upload.producer';
 import { FileDto } from './dto/file.dto';
 import { File } from './entities/file.entity';
 import { FileService } from './file.service';
@@ -20,7 +21,18 @@ import { FileService } from './file.service';
 @ApiTags('File')
 @Controller('files')
 export class FileController {
-  constructor(private readonly service: FileService) {}
+  constructor(
+    private readonly service: FileService,
+    private readonly uploadProducer: UploadProducer,
+  ) {}
+
+  @PostApiResponse(File, FileDto, '/queue')
+  @UseInterceptors(FilesInterceptor('files'))
+  public async upload(
+    @UploadedFiles() files: Express.Multer.File[],
+  ): Promise<void> {
+    this.uploadProducer.upload(files);
+  }
 
   @GetApiResponse(File, '/:ownerId/download')
   public async getFileDownload(
@@ -71,7 +83,7 @@ export class FileController {
   @UseInterceptors(FilesInterceptor('files'))
   public create(@UploadedFiles() files: FileDto[]): Promise<File[]> {
     files.forEach((file) => {
-      file = new FileDto(file);
+      new FileDto(file);
     });
 
     return this.service.create(files);

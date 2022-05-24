@@ -35,13 +35,13 @@ export class UploadRepository {
       Bucket: config.bucketName,
       Key: this.generateFileKey(file.originalname),
       ContentType: file.mimetype,
-      Body: file.buffer,
+      Body: Buffer.from(file.buffer),
       ACL: config.defaultFilesACL,
     };
   }
 
   private generateFileKey(originalName: string): string {
-    const fileName = originalName.split('.').shift();
+    const fileName = originalName?.split('.')?.shift() ?? originalName;
     return `${fileName}_${Date.now()}`;
   }
 }
